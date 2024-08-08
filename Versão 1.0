@@ -1,0 +1,68 @@
+/*
+INSTITUTO FEDERAL DE CIÊNCIA, EDUCAÇÃO E TECNOLOGIA DA PARAÍBA
+COMPONENTE CURRICULAR: MICROCONTROLADORES 
+DOSCENTE: NELSON OLIVEIRA
+
+Projete um código onde: 
+Se o botão for pressionado por 3 segundos, mudar estado do led vermelho.
+Se o botão for pressionado por menos de 3 segundo, mudar estado do led azul.
+Led vermelho começa ligado 
+Led azul começa apagado 
+
+Versão:
+Componentes do grupo: 
+Guilherme Guedes;
+Vitor B. Albuqerque
+Hildemar Rikelmy
+Edilson Vinnicius 
+Suzianne Maria
+Maria Cecilia 
+Izabely Maria
+*/
+ 
+int led1 = 13; // declara led na porta 13
+int led2 = 12; // declara led na porta 12
+int pushbutton = 4 ; // declara o push button na porta 2
+bool estadoled1 = 0; // variavel de controle led1 
+bool estadoled2 = 1; // variavel de controle led2
+unsigned long buttonPressStart = 0; // variavel para armazenar o tempo de inicio da pressao do botao
+  
+void setup()
+{
+  pinMode(pushbutton, INPUT_PULLUP); // define o pino do botao como entrada; 
+  //usando os resistores internos do atmega 328p
+  pinMode(led1, OUTPUT);// define LED como saida
+  pinMode(led2, OUTPUT);
+  digitalWrite(12, HIGH);
+  Serial.begin(9600); // ativa o monitor serial 
+}
+
+void loop()
+{
+  if (digitalRead(pushbutton) == LOW) // Se o botão for pressionado
+  {
+    if (buttonPressStart == 0) {
+      buttonPressStart = millis(); // armazena o tempo de inicio da pressao do botao
+    }
+
+    if ((millis() - buttonPressStart) >= 3000 && (millis() - buttonPressStart) <= 4000) { // se o botao for pressionado entre 3 e 4 segundos
+      estadoled2 = !estadoled2; // troca o estado do led2
+      digitalWrite(led2, estadoled2);
+      while (digitalRead(pushbutton) == LOW); // mantem a leitura do botao em loop ate soltar o botao
+      buttonPressStart = 0; // reseta o tempo de inicio da pressao do botao
+    }
+  }
+  else
+  {
+    if (buttonPressStart != 0 && (millis() - buttonPressStart) < 3000) { // se o botao for solto antes de 3 segundos
+      estadoled1 = !estadoled1; // troca o estado do led1
+      digitalWrite(led1, estadoled1); // escreve o novo estado no LED
+    }
+    buttonPressStart = 0; // reseta o tempo de inicio da pressao do botao
+  }
+  
+  Serial.print(digitalRead(led1)); // imprime o grafico no monitor serial 
+  Serial.print(",");
+  Serial.println(2+digitalRead(led2));
+  
+}
